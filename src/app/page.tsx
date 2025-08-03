@@ -1,13 +1,18 @@
 "use client";
 import React, { useEffect } from "react";
-import { handleGetAllUsers } from "@/api/handlers/aaa";
+import { handleGetAllUsers, handleGetMe } from "@/api/handlers/aaa";
 import Users from "@/components/dashboard/Users";
 import Triggers from "@/components/dashboard/Triggers";
 import TriggerUserMap from "@/components/dashboard/TriggerUserMap";
 import Notifications from "@/components/dashboard/Notifications";
 import { handleGetAllTriggers } from "@/api/handlers/trigger";
-import { handleGetAllNotifications } from "@/api/handlers/notification";
+import {
+  handleGetAllNotifications,
+  handleGetUserNotifications,
+} from "@/api/handlers/notification";
 import { useTriggerUserStore } from "@/store/useTriggerUserStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { toast } from "sonner";
 
 export default function HomePage() {
   const {
@@ -17,15 +22,29 @@ export default function HomePage() {
 
     setNotifications,
   } = useTriggerUserStore();
-
-  // Replacing addTrigger with setTriggers
-
-  // markRead uses updateNotification action from store
-
+  const { login } = useAuthStore();
   useEffect(() => {
-    handleGetAllUsers().then((res) => setUsers(res.data));
-    handleGetAllTriggers().then((res) => setTriggers(res.data));
-    handleGetAllNotifications().then((res) => setNotifications(res.data));
+    try {
+      handleGetMe()
+        .then((res) => {
+          if (res.data) {
+            login(res.data);
+            handleGetUserNotifications(res.data.id).then((res) =>
+              setNotifications(res.data.data!)
+            );
+          }
+        })
+        .catch((reason) => {
+          toast.error("You aren't logged in");
+          handleGetAllNotifications().then((res) =>
+            setNotifications(res.data.data!)
+          );
+        });
+    } catch (error) {
+      console.log(error);
+    }
+    handleGetAllUsers().then((res) => setUsers(res.data.data!));
+    handleGetAllTriggers().then((res) => setTriggers(res.data.data!));
   }, []);
 
   return (

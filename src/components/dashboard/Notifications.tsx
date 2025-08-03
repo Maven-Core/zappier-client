@@ -10,14 +10,39 @@ import {
 import { Button } from "../ui/button";
 import { DisplayNotificationDto } from "@/api/dtos/notification/display-notification.dto";
 import { useTriggerUserStore } from "@/store/useTriggerUserStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useEffect } from "react";
+import {
+  handleGetAllNotifications,
+  handleGetUserNotifications,
+} from "@/api/handlers/notification";
+import { toast } from "sonner";
 
 interface NotificationsProps {}
 const Notifications: React.FC<NotificationsProps> = ({}) => {
-  const { notifications, markNotificationAsRead } = useTriggerUserStore();
+  const { notifications, markNotificationAsRead, setNotifications } =
+    useTriggerUserStore();
+  const { user } = useAuthStore();
 
   const markRead = (id: number) => {
     markNotificationAsRead(id);
   };
+
+  useEffect(() => {
+    if (!user)
+      handleGetAllNotifications()
+        .then((res) => setNotifications(res.data.data!))
+        .catch((reason) =>
+          toast.error(`Couldn't get notifications: ${reason}`)
+        );
+    else {
+      handleGetUserNotifications(user.id)
+        .then((res) => setNotifications(res.data.data!))
+        .catch((reason) =>
+          toast.error(`Couldn't get notifications: ${reason}`)
+        );
+    }
+  }, [user]);
 
   return (
     <Card className="col-span-full">

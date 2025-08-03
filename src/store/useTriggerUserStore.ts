@@ -24,6 +24,7 @@ type TriggerUserState = {
 
   // Trigger Actions
   updateTrigger: (updated: DisplayTriggerDto) => void;
+  addTrigger: (trigger: DisplayTriggerDto) => void;
   deleteTrigger: (id: number) => void;
 
   // Notification Actions
@@ -65,6 +66,11 @@ export const useTriggerUserStore = create<TriggerUserState>((set, get) => ({
   updateTrigger: (updated) =>
     set((state) => ({
       triggers: state.triggers.map((t) => (t.id === updated.id ? updated : t)),
+    })),
+
+  addTrigger: (trigger) =>
+    set((state) => ({
+      triggers: [...state.triggers, trigger],
     })),
 
   deleteTrigger: (id) =>

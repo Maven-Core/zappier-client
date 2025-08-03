@@ -1,12 +1,16 @@
-import { IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { DisplayUserDto } from "./display-user.dto";
 
-export class LoginDto {
-  @ApiProperty()
-  @IsString()
+export interface LoginDto {
   username: string;
 
-  @ApiProperty()
-  @IsString()
   password: string;
+}
+
+export interface BackDoorLoginDto {
+  username: string;
+}
+
+export interface DisplayLoginDto {
+  user: DisplayUserDto;
+  access_token: string;
 }

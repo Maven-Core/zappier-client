@@ -10,6 +10,7 @@ export const baseURL = "http://localhost:3020/";
 // Create an instance of Axios with custom configuration
 const axios = Axios.create({
   baseURL: baseURL, // Set your base URL here
+  withCredentials: true,
   // httpsAgent: httpsAgent,
 });
 
